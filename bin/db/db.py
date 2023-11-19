@@ -1,16 +1,37 @@
+from datetime import date
+
 from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey, Boolean
-from sqlalchemy.orm import sessionmaker, declarative_base, relationship
+from sqlalchemy.orm import declarative_base, relationship, Session
 
 from bin.ect import cfg
 
-engine = create_engine("sqlite:////" + cfg.PATH_DB)
-Session = sessionmaker(bind=engine)
-session = Session()
-
-Base = declarative_base()
+ENGINE = create_engine("sqlite:////" + cfg.PATH_DB)
+BASE = declarative_base()
 
 
-class Users(Base):
+def add_feedback(user_id: int, text: str) -> None:
+    with Session(ENGINE) as session:
+        feedback = Feedbacks(
+            text=text,
+            user_id=user_id,
+            time=date.today()
+        )
+        session.add(feedback)
+        session.commit()
+
+
+def add_suggestion(user_id: int, text: str) -> None:
+    with Session(ENGINE) as session:
+        suggestion = Suggestions(
+            text=text,
+            user_id=user_id,
+            time=date.today()
+        )
+        session.add(suggestion)
+        session.commit()
+
+
+class Users(BASE):
     __tablename__ = "users"
 
     user_id = Column(Integer, primary_key=True)
@@ -21,7 +42,7 @@ class Users(Base):
     answers = relationship("Answers", backref="Users")
 
 
-class Suggestions(Base):
+class Suggestions(BASE):
     __tablename__ = "suggestions"
 
     suggestion_id = Column(Integer, primary_key=True)
@@ -30,7 +51,7 @@ class Suggestions(Base):
     time = Column(Date)
 
 
-class Feedbacks(Base):
+class Feedbacks(BASE):
     __tablename__ = "feedbacks"
 
     feedback_id = Column(Integer, primary_key=True)
@@ -39,7 +60,7 @@ class Feedbacks(Base):
     time = Column(Date)
 
 
-class Questions(Base):
+class Questions(BASE):
     __tablename__ = "questions"
 
     question_id = Column(Integer, primary_key=True)
@@ -50,7 +71,7 @@ class Questions(Base):
     answers = relationship("Answers", backref="Questions")
 
 
-class Answers(Base):
+class Answers(BASE):
     __tablename__ = "answers"
 
     answer_id = Column(Integer, primary_key=True)
@@ -60,7 +81,7 @@ class Answers(Base):
     time = Column(Date)
 
 
-class Columns(Base):
+class Columns(BASE):
     __tablename__ = "columns"
 
     column_id = Column(Integer, primary_key=True)
@@ -70,4 +91,4 @@ class Columns(Base):
     update_time = Column(Date)
 
 
-Base.metadata.create_all(engine)
+BASE.metadata.create_all(ENGINE)

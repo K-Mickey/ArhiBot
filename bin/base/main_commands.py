@@ -1,6 +1,6 @@
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 
 from bin.kb import inline
 
@@ -15,6 +15,13 @@ async def start_command(message: Message) -> None:
            "создавать связь с подписчиками и в будущем, я буду помогать " \
            "ориентироваться в темах на канале."
     await message.answer(text, reply_markup=inline.menu())
+
+
+@router.callback_query(inline.Menu.filter(F.value == "Меню"))
+async def inline_menu(callback: CallbackQuery) -> None:
+    await callback.message.delete()
+    await callback.answer()
+    await start_command(callback.message)
 
 
 @router.message(Command("help"))

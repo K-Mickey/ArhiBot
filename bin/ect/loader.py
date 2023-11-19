@@ -4,7 +4,7 @@ import sys
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 
-from bin.base import main_commands
+from bin.base import main_commands, feedback, suggestion
 from bin.ect import cfg
 
 
@@ -15,6 +15,8 @@ async def run() -> None:
     dp = Dispatcher()
     dp.include_routers(
         main_commands.router,
+        feedback.router,
+        suggestion.router,
     )
     bot = Bot(cfg.BOT_TOKEN, parse_mode=ParseMode.HTML)
 

@@ -14,3 +14,10 @@ def menu() -> InlineKeyboardMarkup:
     builder.button(text="Опросник", callback_data=Menu(value="Опросник"))
     builder.adjust(1)
     return builder.as_markup()
+
+
+def to_menu() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.button(text="Меню", callback_data=Menu(value="Меню"))
+    builder.adjust(1)
+    return builder.as_markup()

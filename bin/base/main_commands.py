@@ -2,16 +2,19 @@ from aiogram import Router
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 
+from bin.kb import inline
+
+
 router = Router()
 
 
 @router.message(CommandStart())
 async def start_command(message: Message) -> None:
-    text = "Салют Я - твой помощник на канале Блока архитектора. " \
+    text = "Салют\nЯ - твой помощник на канале Блока архитектора.\n" \
            "Я создан, чтобы улучшать контент, который выходит на канале, " \
            "создавать связь с подписчиками и в будущем, я буду помогать " \
            "ориентироваться в темах на канале."
-    await message.answer(text)
+    await message.answer(text, reply_markup=inline.menu())
 
 
 @router.message(Command("help"))

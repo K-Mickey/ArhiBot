@@ -5,7 +5,7 @@ from sqlalchemy.orm import declarative_base, relationship, Session
 
 from bin.ect import cfg
 
-ENGINE = create_engine("sqlite:////" + cfg.PATH_DB)
+ENGINE = create_engine("sqlite:///" + cfg.PATH_DB, echo=True)
 BASE = declarative_base()
 
 
@@ -29,6 +29,25 @@ def add_suggestion(user_id: int, text: str) -> None:
         )
         session.add(suggestion)
         session.commit()
+
+
+def add_answers(user_id: int, answers: dict) -> None:
+    with Session(ENGINE) as session:
+        today = date.today()
+        for id, text in answers.items():
+            session.add(Answers(
+                user_id=user_id,
+                question_id=id,
+                text=text,
+                date=today
+            ))
+        session.commit()
+
+
+def get_questions() -> list:
+    with Session(ENGINE) as session:
+        return session.query(Questions).filter(Questions.visible is True) \
+            .sort_by(Questions.order).all()
 
 
 class Users(BASE):

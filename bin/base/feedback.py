@@ -5,6 +5,7 @@ from aiogram.types import CallbackQuery, Message
 
 from bin.db.db import add_feedback
 from bin.ect import cfg
+from bin.ect.utils import send_message
 from bin.kb import inline
 
 
@@ -33,9 +34,9 @@ async def feedback_message(message: Message, state: FSMContext) -> None:
            "нажимайте на меню внизу"
 
     add_feedback(message.from_user.id, message.text)
-    text_message = f"Пользователь {message.from_user.get_mention()} " \
+    text_message = f"Пользователь {message.from_user.mention_html()} " \
                    f"прислал сообщение:\n{message.text}"
-    await message.send_message(cfg.ID_SENDER, text_message)
+    await send_message(cfg.ID_SENDER, text_message)
 
     await message.answer(text, reply_markup=inline.to_menu())
     await state.clear()

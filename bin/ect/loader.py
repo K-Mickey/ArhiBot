@@ -4,11 +4,12 @@ import sys
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 
-from bin.base import main_commands, feedback, suggestion
+from bin.base import main_commands, feedback, suggestion, question
 from bin.ect import cfg
 
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+bot = Bot(cfg.BOT_TOKEN, parse_mode=ParseMode.HTML)
 
 
 async def run() -> None:
@@ -17,7 +18,7 @@ async def run() -> None:
         main_commands.router,
         feedback.router,
         suggestion.router,
+        question.router
     )
-    bot = Bot(cfg.BOT_TOKEN, parse_mode=ParseMode.HTML)
 
     await dp.start_polling(bot)

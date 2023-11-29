@@ -2,6 +2,8 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from bin.ect.model import Columns
+
 
 class Menu(CallbackData, prefix="menu"):
     value: str
@@ -17,6 +19,10 @@ class AdminButtonColumn(CallbackData, prefix="admin_button"):
 
 class AdminButtonQuestion(CallbackData, prefix="admin_button_question"):
     value: int
+
+
+class ColumnData(CallbackData, prefix="column_data"):
+    value: str
 
 
 def menu(is_admin: bool = False) -> InlineKeyboardMarkup:
@@ -109,5 +115,14 @@ def admin_custom_question(buttons: dict) -> InlineKeyboardMarkup:
     for question_id, text in buttons.items():
         builder.button(text=text, callback_data=AdminButtonQuestion(value=question_id))
     builder.button(text="Обратно", callback_data=Admin(value="Вопросы"))
+    builder.adjust(1)
+    return builder.as_markup()
+
+
+def column_custom() -> InlineKeyboardMarkup:
+    columns = Columns.get()
+    builder = InlineKeyboardBuilder()
+    for column in columns:
+        builder.button(text=column.text, callback_data=ColumnData(value=column.text))
     builder.adjust(1)
     return builder.as_markup()

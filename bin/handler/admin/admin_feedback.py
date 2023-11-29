@@ -19,7 +19,7 @@ async def inline_get_all_feedbacks(callback: CallbackQuery) -> None:
     feedbacks = Feedbacks.get(5 if "Получить 5 отзывов" in callback.data else None)
     text = '' if feedbacks else "Нет отзывов"
     for feedback in feedbacks:
-        text += f'<b>Отзыв от {feedback.name}</b> {feedback.time}\n{feedback.text}\n\n'
+        text += f"<b>Отзыв от <a href='tg://user?id={feedback.user_id}'>{feedback.user_name}</a></b> {feedback.time}\n{feedback.text}\n\n"
 
     await callback.message.answer(text)
     from bin.handler.admin.admin import inline_admin

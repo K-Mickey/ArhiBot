@@ -20,7 +20,8 @@ async def inline_get_all_suggestions(callback: CallbackQuery) -> None:
 
     text = '' if suggestions else "Нет предложений"
     for suggestion in suggestions:
-        text += f'<b>Предложение от {suggestion.name}</b> {suggestion.time}\n{suggestion.text}\n\n'
+        text += f"<b>Предложение от <a href='tg://user?id={suggestion.user_id}'>{suggestion.user_name}</a>" \
+                f"</b> {suggestion.time}\n{suggestion.text}\n\n"
     await callback.message.answer(text)
     from bin.handler.admin.admin import inline_admin
     await inline_admin(callback)

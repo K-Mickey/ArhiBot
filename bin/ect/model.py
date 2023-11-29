@@ -66,7 +66,7 @@ class Suggestions(BASE):
     @staticmethod
     def get(n: int = None) -> list:
         with Session(ENGINE) as session:
-            query = session.query(Suggestions.user_id, Suggestions.text, Suggestions.time, Users.name)\
+            query = session.query(Suggestions.user_id, Suggestions.text, Suggestions.time, Users.name.label('user_name')) \
                 .join(Users).order_by(Suggestions.time.desc())
             if not n:
                 return query.all()
@@ -96,7 +96,7 @@ class Feedbacks(BASE):
     @staticmethod
     def get(n: int = None) -> list:
         with Session(ENGINE) as session:
-            query = session.query(Feedbacks.time, Feedbacks.text, Feedbacks.user_id, Users.name)\
+            query = session.query(Feedbacks.time, Feedbacks.text, Feedbacks.user_id, Users.name.label('user_name')) \
                 .join(Users).order_by(Feedbacks.time.desc())
             if not n:
                 return query.all()
@@ -115,9 +115,11 @@ class Questions(BASE):
     answers = relationship("Answers", backref="Questions")
 
     @staticmethod
-    def get(question_id: int = None):
+    def get(question_id: int = None, only_visible: bool = False):
         with Session(ENGINE) as session:
             query = session.query(Questions)
+            if only_visible:
+                query = query.filter(Questions.visible == True)
             if not question_id:
                 return query.order_by(Questions.order).all()
             else:
@@ -166,14 +168,22 @@ class Answers(BASE):
                     user_id=user_id,
                     question_id=id,
                     text=text,
-                    date=today
+                    time=today
                 ))
             session.commit()
 
     @staticmethod
     def get(n: int = None) -> list:
         with Session(ENGINE) as session:
-            query = session.query(Answers).order_by(Answers.time.desc())
+            query = session.query(
+                Answers.answer_id,
+                Answers.question_id,
+                Answers.user_id,
+                Answers.text,
+                Answers.time,
+                Users.name.label('user_name'),
+                Questions.text.label('question_text')
+            ).join(Users).join(Questions).order_by(Answers.time.desc())
             if not n:
                 return query.all()
             else:
@@ -204,7 +214,7 @@ class Columns(BASE):
     @staticmethod
     def get(text: str = None) -> list:
         with Session(ENGINE) as session:
-            query = session.query(Columns)
+            query = session.query(Columns).order_by(Columns.order.desc())
             if text:
                 return query.filter(Columns.text == text).all()
             else:

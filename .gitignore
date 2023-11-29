@@ -2,3 +2,4 @@
 .idea
 /.env
 /src/db/database.db
+/src/db/storage.db

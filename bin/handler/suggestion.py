@@ -34,8 +34,7 @@ async def suggestion_message(message: Message, state: FSMContext) -> None:
            "нажимайте на меню внизу"
 
     Suggestions.add(message.from_user.id, message.text)
-    text_message = f"Пользователь {message.from_user.mention_html()} " \
-                   f"прислал сообщение:\n{message.text}"
+    text_message = f"Пользователь {message.from_user.mention_html()} прислал сообщение:\n{message.text}"
     await send_message(cfg.ID_SENDER, text_message)
 
     await message.answer(text, reply_markup=inline.to_menu())

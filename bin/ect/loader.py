@@ -4,7 +4,8 @@ import sys
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 
-from bin.base import main_commands, feedback, suggestion, question
+from bin.handler import main_commands, feedback, suggestion, question
+from bin.handler.admin import admin
 from bin.ect import cfg
 
 
@@ -18,7 +19,8 @@ async def run() -> None:
         main_commands.router,
         feedback.router,
         suggestion.router,
-        question.router
+        question.router,
+        admin.router,
     )
 
     await dp.start_polling(bot)

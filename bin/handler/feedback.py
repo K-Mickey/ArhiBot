@@ -3,11 +3,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, Message
 
-from bin.db.db import add_feedback
 from bin.ect import cfg
 from bin.ect.utils import send_message
 from bin.kb import inline
-
+from bin.ect.model import Feedbacks
 
 router = Router()
 
@@ -33,7 +32,7 @@ async def feedback_message(message: Message, state: FSMContext) -> None:
            "Если вы хотите продолжить взаимодействие, " \
            "нажимайте на меню внизу"
 
-    add_feedback(message.from_user.id, message.text)
+    Feedbacks.add(message.from_user.id, message.text)
     text_message = f"Пользователь {message.from_user.mention_html()} " \
                    f"прислал сообщение:\n{message.text}"
     await send_message(cfg.ID_SENDER, text_message)

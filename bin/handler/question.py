@@ -3,10 +3,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 
-from bin.db.db import get_questions, add_answers
 from bin.ect import cfg
 from bin.ect.utils import send_message
 from bin.kb import inline
+from bin.ect.model import Questions, Answers
 
 router = Router()
 
@@ -37,7 +37,7 @@ async def send_question(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
 
     if "Вопросы" not in data:
-        data["Вопросы"] = get_questions()
+        data["Вопросы"] = Questions.get()
     questions = data["Вопросы"]
 
     if "Предыдущий" not in data and questions:
@@ -74,7 +74,7 @@ async def last_question(message: Message, state: FSMContext) -> None:
         quiz[question.text] = answers[question.question_id]
     quiz = "\n".join([f"{k}: {v}" for k, v in quiz.items()])
 
-    add_answers(message.from_user.id, answers)
+    Answers.add(message.from_user.id, answers)
     text_message = f"Пользователь {message.from_user.get_mention()} " \
                    f"прислал сообщение:\n{quiz}"
     await send_message(cfg.ID_SENDER, text_message)

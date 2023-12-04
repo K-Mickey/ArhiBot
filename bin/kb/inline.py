@@ -101,10 +101,10 @@ def admin_suggestion() -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
-def admin_custom_column(buttons: list) -> InlineKeyboardMarkup:
+def admin_custom_column(buttons: dict) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    for button in buttons:
-        builder.button(text=button, callback_data=AdminButtonColumn(value=button))
+    for column_id, text in buttons.items():
+        builder.button(text=text, callback_data=AdminButtonColumn(value=str(column_id)))
     builder.button(text="Обратно", callback_data=Admin(value="Рубрики"))
     builder.adjust(1)
     return builder.as_markup()
@@ -123,6 +123,6 @@ def column_custom() -> InlineKeyboardMarkup:
     columns = Columns.get()
     builder = InlineKeyboardBuilder()
     for column in columns:
-        builder.button(text=column.text, callback_data=ColumnData(value=column.text))
+        builder.button(text=column.text, callback_data=ColumnData(value=str(column.column_id)))
     builder.adjust(1)
     return builder.as_markup()

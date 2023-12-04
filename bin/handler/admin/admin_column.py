@@ -55,21 +55,25 @@ async def inline_edit_column(callback: CallbackQuery) -> None:
     columns = Columns.get()
 
     text = "Выберите рубрику" if columns else "Нет рубрик"
-    text_columns = [column.text for column in columns]
+    text_columns = {column.column_id: column.text for column in columns}
     await callback.message.answer(text, reply_markup=inline.admin_custom_column(text_columns))
     await callback.message.delete()
     await callback.answer()
 
 
 @router.callback_query(inline.AdminButtonColumn.filter())
-async def inline_edit_column_callback(callback: CallbackQuery, state: FSMContext) -> None:
+async def inline_edit_column_callback(
+        callback: CallbackQuery,
+        state: FSMContext,
+        callback_data: inline.AdminButtonColumn
+) -> None:
     await callback.answer()
     await callback.message.delete()
-    button = callback.data.split(':', 1)[1]
-    await state.update_data(text=button)
+    column_id = int(callback_data.value)
+    await state.update_data(column_id=column_id)
     await state.set_state(AdminColumnChangeState.text)
 
-    button = Columns.get(button)[0]
+    button = Columns.get(column_id)
 
     await callback.message.answer(
         f"{button.text}\nПорядок: {button.order}\nВидимость: {'да' if button.visible else 'нет'}\n\n"
@@ -96,10 +100,7 @@ async def message_edit_column_order(message: Message, state: FSMContext) -> None
 @router.message(AdminColumnChangeState.visible)
 async def message_edit_column_visible(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
-    if "order" in data:
-        Columns.update(data["text"], data["order"], visible=message.text.strip().lower() == "да")
-    else:
-        Columns.update(data["text"], visible=message.text.strip().lower() == "да")
+    Columns.update(**data, visible=message.text.strip().lower() == "да")
     await message.answer("Рубрика изменена")
     await state.clear()
     from bin.handler.admin.admin import message_admin

@@ -6,7 +6,7 @@ from aiogram.types import CallbackQuery, Message
 from bin.ect import cfg
 from bin.ect.utils import send_message
 from bin.kb import inline
-from bin.ect.model import Questions, Answers
+from bin.ect.model import Questions, Answers, Columns
 from bin.kb.inline import ColumnData
 
 router = Router()
@@ -33,7 +33,8 @@ async def inline_menu(callback: CallbackQuery, state: FSMContext) -> None:
 async def question_callback(callback: CallbackQuery, state: FSMContext, callback_data: ColumnData) -> None:
     await callback.answer()
     await callback.message.delete()
-    await update_data(callback_data.value, state)
+    column = Columns.get(int(callback_data.value))
+    await update_data(column.text, state)
     await send_next_message(callback.message, state)
 
 

@@ -212,18 +212,18 @@ class Columns(BASE):
             session.commit()
 
     @staticmethod
-    def get(text: str = None) -> list:
+    def get(column_id: int = None):
         with Session(ENGINE) as session:
             query = session.query(Columns).order_by(Columns.order.desc())
-            if text:
-                return query.filter(Columns.text == text).all()
+            if column_id:
+                return query.filter(Columns.column_id == column_id).first()
             else:
                 return query.all()
 
     @staticmethod
-    def update(text: str, order: int = 0, visible: bool = True) -> None:
+    def update(column_id: int, text: str, order: int = 0, visible: bool = True) -> None:
         with Session(ENGINE) as session:
-            column = session.query(Columns).filter(Columns.text == text).first()
+            column = session.query(Columns).filter(Columns.column_id == column_id).first()
             column.text = text
             column.order = order
             column.visible = visible

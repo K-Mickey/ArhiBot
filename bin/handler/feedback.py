@@ -28,13 +28,9 @@ async def feedback(callback: CallbackQuery, state: FSMContext) -> None:
 
 @router.message(FeedbackState.wait, F.text)
 async def feedback_message(message: Message, state: FSMContext) -> None:
-    text = "Большое спасибо за ваше внимание и ответ! " \
-           "Если вы хотите продолжить взаимодействие, " \
-           "нажимайте на меню внизу"
-
     Feedbacks.add(message.from_user.id, message.text)
     text_message = f"Пользователь {message.from_user.mention_html()} прислал сообщение:\n{message.text}"
     await send_message(cfg.ID_SENDER, text_message)
 
-    await message.answer(text, reply_markup=inline.to_menu())
+    await message.answer(cfg.BYE_MSG, reply_markup=inline.to_menu())
     await state.clear()

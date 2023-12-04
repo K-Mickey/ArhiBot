@@ -3,6 +3,7 @@ import sys
 
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
+from aiogram.types import BotCommand
 from aiogram_sqlite_storage.sqlitestore import SQLStorage
 
 from bin.handler import main_commands, feedback, suggestion, question
@@ -25,4 +26,12 @@ async def run() -> None:
         admin.router,
     )
 
+    await set_default_commands(bot)
     await dp.start_polling(bot)
+
+
+async def set_default_commands(bot: Bot) -> None:
+    await bot.set_my_commands([
+        BotCommand(command='start', description='Запустить бота'),
+        BotCommand(command='about', description='О боте'),
+    ])

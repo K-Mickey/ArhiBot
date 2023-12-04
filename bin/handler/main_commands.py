@@ -37,7 +37,8 @@ async def inline_menu(callback: CallbackQuery, state: FSMContext) -> None:
     await start_command(callback.message, state)
 
 
-@router.message(Command("help"))
-async def help_command(message: Message) -> None:
-    text = "Введите команду /start для начала работы."
+@router.message(Command("about"))
+async def about_command(message: Message) -> None:
+    text = "По всем вопросам и предложениям разработки бота пишите " \
+           "<a href='https://t.me/k_mickey'>создателю Михаилу.</a>"
     await message.answer(text)

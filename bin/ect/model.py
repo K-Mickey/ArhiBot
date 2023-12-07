@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey, Boolean
+from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey, Boolean, select
 from sqlalchemy.orm import declarative_base, relationship, Session
 
 from bin.ect import cfg
@@ -174,20 +174,24 @@ class Answers(BASE):
 
     @staticmethod
     def get(n: int = None) -> list:
+        columns = (
+            Answers.answer_id,
+            Answers.question_id,
+            Answers.user_id,
+            Answers.text,
+            Answers.time,
+            Users.name.label('user_name'),
+            Questions.text.label('question_text')
+        )
         with Session(ENGINE) as session:
-            query = session.query(
-                Answers.answer_id,
-                Answers.question_id,
-                Answers.user_id,
-                Answers.text,
-                Answers.time,
-                Users.name.label('user_name'),
-                Questions.text.label('question_text')
-            ).join(Users).join(Questions).order_by(Answers.time.desc())
             if not n:
-                return query.all()
+                return session.query(*columns).join(Users).join(Questions).order_by(Answers.time.desc()).all()
             else:
-                return query.limit(n).all()
+                subquery = session.query(Answers.user_id, Answers.time).order_by(Answers.time.desc())\
+                    .distinct().limit(n).subquery()
+                return session.query(*columns).join(Users).join(Questions)\
+                    .join(subquery, (Answers.user_id == subquery.c.user_id) & (Answers.time == subquery.c.time))\
+                    .order_by(Answers.time.desc()).all()
 
 
 class Columns(BASE):

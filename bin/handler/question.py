@@ -16,7 +16,7 @@ class QuestionState(StatesGroup):
     wait = State()
 
 
-@router.callback_query(inline.Menu.filter(F.value == "Опросник"))
+@router.callback_query(inline.Menu.filter(F.value == "Пройти опрос"))
 async def inline_menu(callback: CallbackQuery, state: FSMContext) -> None:
     text = "<b>Ответьте на небольшое количество вопросов о канале, " \
            "чтобы мы могли лучше понять запросы и ценности своей аудитории</b>"
@@ -29,13 +29,46 @@ async def inline_menu(callback: CallbackQuery, state: FSMContext) -> None:
     await send_question(callback.message, state)
 
 
-@router.callback_query(ColumnData.filter())
+@router.callback_query(ColumnData.filter(F.value == "Завершить выбор"))
 async def question_callback(callback: CallbackQuery, state: FSMContext, callback_data: ColumnData) -> None:
     await callback.answer()
     await callback.message.delete()
-    column = Columns.get(int(callback_data.value))
-    await update_data(column.text, state)
+
+    data = await state.get_data()
+    if 'Вопрос о рубрике' in data:
+        columns = ', '.join(data['Вопрос о рубрике'])
+        del data['Вопрос о рубрике']
+        await state.set_data(data)
+    else:
+        columns = 'Ничего не выбрано'
+
+    await update_data(columns, state)
     await send_next_message(callback.message, state)
+
+
+@router.callback_query(ColumnData.filter())
+async def question_callback(callback: CallbackQuery, state: FSMContext, callback_data: ColumnData) -> None:
+    column = Columns.get(int(callback_data.value)).text
+    data = await state.get_data()
+
+    if 'Вопрос о рубрике' not in data:
+        data['Вопрос о рубрике'] = []
+
+    column_question = data['Вопрос о рубрике']
+    if column in column_question:
+        column_question.remove(column)
+        await callback.answer("Удалена")
+    else:
+        column_question.append(column)
+        await callback.answer("Добавлена")
+    await state.set_data(data)
+
+    if column_question:
+        question = 'Ваш выбор: ' + ', '.join(column_question)
+    else:
+        question = data["Вопросы"][data.get("Предыдущий", 0)].text
+
+    await callback.message.edit_text(question, reply_markup=inline.column_custom())
 
 
 @router.message(QuestionState.wait, F.text)

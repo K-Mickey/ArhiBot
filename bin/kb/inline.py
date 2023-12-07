@@ -29,7 +29,7 @@ def menu(is_admin: bool = False) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(text="Обратная связь", callback_data=Menu(value="Обратная связь"))
     builder.button(text="Предложения", callback_data=Menu(value="Предложения"))
-    builder.button(text="Опросник", callback_data=Menu(value="Опросник"))
+    builder.button(text="Пройти опрос", callback_data=Menu(value="Пройти опрос"))
 
     if is_admin:
         builder.button(text="Админ", callback_data=Menu(value="Админ"))
@@ -124,5 +124,6 @@ def column_custom() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for column in columns:
         builder.button(text=column.text, callback_data=ColumnData(value=str(column.column_id)))
+    builder.button(text="Завершить выбор", callback_data=ColumnData(value="Завершить выбор"))
     builder.adjust(1)
     return builder.as_markup()

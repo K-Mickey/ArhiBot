@@ -6,12 +6,13 @@ from aiogram.enums import ParseMode
 from aiogram.types import BotCommand
 from aiogram_sqlite_storage.sqlitestore import SQLStorage
 
+from bin.ect.utils import create_logger
 from bin.handler import main_commands, feedback, suggestion, question
 from bin.handler.admin import admin
 from bin.ect import cfg
 
 
-logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+create_logger()
 bot = Bot(cfg.BOT_TOKEN, parse_mode=ParseMode.HTML)
 
 

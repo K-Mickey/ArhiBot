@@ -124,6 +124,6 @@ def column_custom() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for column in columns:
         builder.button(text=column.text, callback_data=ColumnData(value=str(column.column_id)))
-    builder.button(text="Завершить выбор", callback_data=ColumnData(value="Завершить выбор"))
+    builder.button(text="Завершить выбор❗", callback_data=ColumnData(value="Завершить выбор"))
     builder.adjust(1)
     return builder.as_markup()
